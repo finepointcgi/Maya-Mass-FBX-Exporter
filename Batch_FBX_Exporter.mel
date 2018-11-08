@@ -2,40 +2,39 @@ global string $exportpath;
 
 proc exportmesh(){
   string $FinalExport;
- string $selection[] = `ls -selection -long`;
- print $selection[0]; //the first selected object
- global string $exportpath;
- string $path = `textField -q -fi sourcePath`;//grab the textField text
- string $extension = ".fbx";
- string $object;
- // loop through all objects
-for ( $object in $selection ) {
-  string $tokTmp[];
-  int $count = `tokenize $object "|" $tokTmp`;
-  string $result = $tokTmp[$count - 1];
-     print $object;
-     string $FinalExportPath = $exportpath + $object;
-     print $FinalExportPath;
-     select($object);
-     $FinalExport = $path + "/"+ $result + $extension;
-     FBXExport -f $FinalExport -s;
+  string $selection[] = `ls -selection -long`;
+  print $selection[0]; //the first selected object
+  global string $exportpath;
+  string $path = `textField -q -fi sourcePath`;//grab the textField text
+  string $extension = ".fbx";
+  string $object;
+  // loop through all objects
+  for ( $object in $selection ) {
+    string $tokTmp[];
+    int $count = `tokenize $object "|" $tokTmp`;
+    string $result = $tokTmp[$count - 1];
+    print $object;
+    string $FinalExportPath = $exportpath + $object;
+    print $FinalExportPath;
+    select($object);
+    $FinalExport = $path + "/"+ $result + $extension;
+    FBXExport -f $FinalExport -s;
     }
 }
+
 //creates ui
 proc createui(){
   global string $exportpath;
-    string $window = `window -title "FBX Batch Export"
-    -iconName "Short Name"
-    -widthHeight 260 125`;
-    columnLayout -columnAttach "both" 5 -rowSpacing 10 - columnWidth 250;
-    text -label "Source Directory:" -align "left";
-    textField -w 250 -fi "" sourcePath;
-    button -label "Set default output path" -h 20 -ann "Browse for source folder..." -c "fileBrowserDialog -m 4 -fc \"onOk\" -ft \"directory\" -an \"Select Source Folder\"";
-
-
-     //button -label "SetExportLocation" -command "getFileSystem()";
-     button -label "ExportFBX" -command "exportmesh()";
-     showWindow $window;
+  string $window = `window -title "FBX Batch Export"
+  -iconName "Short Name"
+  -widthHeight 260 125`;
+  columnLayout -columnAttach "both" 5 -rowSpacing 10 - columnWidth 250;
+  text -label "Source Directory:" -align "left";
+  textField -w 250 -fi "" sourcePath;
+  button -label "Set default output path" -h 20 -ann "Browse for source folder..." -c "fileBrowserDialog -m 4 -fc \"onOk\" -ft \"directory\" -an \"Select Source Folder\"";
+  //button -label "SetExportLocation" -command "getFileSystem()";
+  button -label "ExportFBX" -command "exportmesh()";
+  showWindow $window;
 }
 
 //saves out to string filename and textField
