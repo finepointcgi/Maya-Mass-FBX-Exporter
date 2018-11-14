@@ -20,6 +20,7 @@ proc exportmesh(){
     $FinalExport = $path + "/"+ $result + $extension;
     FBXExport -f $FinalExport -s;
     }
+    SelectPrevSelection($selection);
 }
 
 //creates ui
@@ -27,10 +28,11 @@ proc createui(){
   global string $exportpath;
   string $window = `window -title "FBX Batch Export"
   -iconName "Short Name"
-  -widthHeight 260 125`;
+  -widthHeight 260 200`;
   columnLayout -columnAttach "both" 5 -rowSpacing 10 - columnWidth 250;
   button -label "FreezeTransform" -h 20 -ann "FreezeTransform" -c "FreezeTransform()";
   button -label "ResetPivot" -h 20 -ann "ResetPivot" -c "ResetPivot()";
+  button -label "Delete History" -h 20 -ann "Delete History" -c "DelHistory()";
   text -label "Source Directory:" -align "left";
   textField -w 250 -fi "" sourcePath;
   button -label "Set default output path" -h 20 -ann "Browse for source folder..." -c "fileBrowserDialog -m 4 -fc \"onOk\" -ft \"directory\" -an \"Select Source Folder\"";
@@ -52,17 +54,35 @@ proc FreezeTransform()
     select($object);
     FreezeTransformations;
     makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 -pn 1;
+  }
+  SelectPrevSelection($selection);
+}
+
+proc DelHistory(){
+  string $selection[] = `ls -selection -long`;
+  for ( $object in $selection ) {
+    select($object);
     DeleteHistory;
   }
+  SelectPrevSelection($selection);
+
+}
+
+proc SelectPrevSelection(string $selection[]){
+     for ( $object in $selection ) {
+         select -add ($object);
+     }
+
 }
 
 proc ResetPivot(){
   string $selection[] = `ls -selection -long`;
   for ( $object in $selection ) {
     select($object);
-    move -r 0 0 0 $object.scalePivot $object.rotatePivot;
+    xform -ws -piv 0 0 0 $object;
     FreezeTransformations;
     ResetTransformations;
   }
+  SelectPrevSelection($selection);
 }
 createui();
